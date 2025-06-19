@@ -34,23 +34,20 @@ You can install pygame with:
 ```bash
 pip install pygame
 
-📂 Assets
-Make sure the following images are placed in your project directory:
 
-jet.png — the player’s airplane
+## 📂 Assets
 
-missile.png — enemy projectiles
+To ensure everything loads correctly, place the following image files in the **same directory** as your `PlaneGame.py` file (i.e., the root of your project folder):
 
-cloud.png — scenery
+- jet.png — the player’s airplane  
+- missile.png — enemy projectiles  
+- cloud.png — scenery  
+- 1hearts.png, 2hearts.png, 3hearts.png — heart icons for health display  
 
-1hearts.png, 2hearts.png, 3hearts.png — heart icons for health display
+Your folder structure should look like this:
 
-▶️ How to Run
-Simply run: python PlaneGame.py
-
-To ensure everything loads correctly, place the following image files in the same directory as your PlaneGame.py file (i.e., the root of your project folder):
+```plaintext
 /your-project-folder
-│
 ├── PlaneGame.py
 ├── jet.png
 ├── missile.png
@@ -58,28 +55,26 @@ To ensure everything loads correctly, place the following image files in the sam
 ├── 1hearts.png
 ├── 2hearts.png
 └── 3hearts.png
+```
 
-📸 Asset Descriptions
-jet.png: The image of the player-controlled jet
+Make sure all images are in the correct format (.png) and appropriately sized for your game screen.
 
-missile.png: The image representing enemy rockets
+## ▶️ How to Run
 
-cloud.png: Decorative cloud sprites that create depth and visual interest
+From your terminal, run the following command inside the game folder:  
+```bash
+python PlaneGame.py
+```
 
-1hearts.png, 2hearts.png, 3hearts.png: Health indicator icons showing remaining hearts
+Ensure your screen resolution is large enough to view the full game window (it's sized to nearly fullscreen minus 100 pixels).
 
-Make sure all images are in the correct format (.png) and are appropriately sized. The game dynamically scales certain assets like missiles, but having optimized sizes beforehand improves performance.
+## 🧠 Customization Ideas
 
-🧠 Customization Ideas
-Add sound effects and music for collisions and movement
+- Add sound effects or background music  
+- Scale up difficulty as the score increases  
+- Introduce power-ups like temporary shields or speed boosts  
+- Add player plane skins or enemy types  
 
-Introduce difficulty scaling based on score
+## 📃 License
 
-Add collectibles or power-ups
-
-Include more plane models or skins
-
-📃 License
-Feel free to adapt and expand this project for learning or personal fun. Please give credit if reused or modified!
-
-Have fun flying! 🚁
+This game is open for learning, customization, and fun! If you modify or reuse it, feel free to credit the original creator. 
