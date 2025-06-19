@@ -1,0 +1,194 @@
+import pygame
+import random
+
+pygame.init()
+screen_size = pygame.display.Info()
+screen_width = screen_size.current_w - 100
+screen_height = screen_size.current_h - 100
+
+
+score = 0
+font = pygame.font.Font(None, 36)  # Define a font for rendering the score
+
+
+screen = pygame.display.set_mode((screen_width,screen_height))
+
+running = True
+hp = 3
+
+ADDPOINT = pygame.USEREVENT + 3
+pygame.time.set_timer(ADDPOINT, 10000)  # Trigger event every 10 seconds
+
+
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Player, self).__init__()
+        self.surf = pygame.image.load("jet.png").convert()
+        self.surf.set_colorkey((255,255,255),pygame.RLEACCEL)
+        self.width = 65
+        self.height=25
+
+
+        self.rect = self.surf.get_rect()
+
+    def update(self, pressed):
+        if pressed[pygame.K_UP] or pressed[pygame.K_w]:
+            self.rect.move_ip(0, -5)
+        if pressed[pygame.K_DOWN] or pressed[pygame.K_s]:
+            self.rect.move_ip(0, 5)
+        if pressed[pygame.K_RIGHT] or pressed[pygame.K_d]:
+            self.rect.move_ip(5, 0)
+        if pressed[pygame.K_LEFT] or pressed[pygame.K_a]:
+            self.rect.move_ip(-5, 0)
+
+        if self.rect.top < -self.height:
+            self.rect.bottom = screen_height + self.height
+        if self.rect.bottom > screen_height + self.height:
+            self.rect.top = -self.height
+        if self.rect.right > screen_width + self.width:
+            self.rect.left = -self.width
+        if self.rect.left < -self.width:
+            self.rect.right = screen_width + self.width
+
+class Cloud(pygame.sprite.Sprite):
+    def  __init__ (self):
+        super(Cloud, self).__init__()
+        self.surf = pygame.image.load("cloud.png").convert()
+        self.surf.set_colorkey((0,0,0), pygame.RLEACCEL)
+        self.rect = self.surf.get_rect(
+            center=(random.randint(screen_width+50, screen_width+80), random.randint(40,screen_height-40))
+        )
+
+    def update(self):
+        self.rect.move_ip(-5, 0)
+        if self.rect.right < 0:
+            self.kill()
+
+
+
+
+
+class Rocket(pygame.sprite.Sprite):
+    def __init__ (self):
+        super(Rocket, self).__init__()
+        self.image = pygame.image.load("missile.png")
+        self.image = pygame.transform.scale(self.image, (60,30))
+        self.surf = self.image.convert()
+        self.surf.set_colorkey((255, 255, 255), pygame.RLEACCEL)
+        self.rect = self.surf.get_rect(
+            center=(random.randint(screen_width + 50, screen_width + 80), random.randint(40, screen_height - 40))
+        )
+
+    def update(self):
+        self.rect.move_ip(-5, 0)
+        if self.rect.right < 0:
+            self.kill()
+
+plane = Player()
+cloud= Cloud()
+rocket =Rocket()
+
+#Groups
+ADDENEMY = pygame.USEREVENT +1
+ADDCLOUD = pygame.USEREVENT +2
+pygame.time.set_timer(ADDENEMY, 300)
+pygame.time.set_timer(ADDCLOUD, 500)
+clouds = pygame.sprite.Group()
+rockets = pygame.sprite.Group()
+all_sprites = pygame.sprite.Group()
+all_sprites.add(plane)
+
+
+
+
+clock= pygame.time.Clock()
+overlay_timer = 0
+while running:
+    for event in pygame.event.get():
+        if event.type == ADDPOINT:
+            score += 1
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                running = False
+        elif event.type == pygame.QUIT:
+                running = False
+        elif event.type == ADDENEMY:
+            new_rocket = Rocket()
+            rockets.add(new_rocket)
+            all_sprites.add(new_rocket)
+        elif event.type == ADDCLOUD:
+            new_cloud = Cloud()
+            clouds.add(new_cloud)
+            all_sprites.add(new_cloud)
+
+
+
+    pressed = pygame.key.get_pressed()
+    plane.update(pressed)
+    clouds.update()
+    rockets.update()
+
+    pressed = pygame.key.get_pressed()
+    plane.update(pressed)
+
+    
+
+
+    screen.fill((63, 114, 59))
+    for object in all_sprites:
+        screen.blit(object.surf,  object.rect)
+
+    if pygame.sprite.spritecollideany(plane, rockets):
+        hp -= 1
+        col = pygame.sprite.spritecollideany(plane, rockets)
+        col.kill()
+        print(hp)
+    if hp == 3:
+        hpimg = pygame.image.load("3hearts.png").convert_alpha()
+        screen.blit(hpimg,(screen_width-300,-70))
+
+    elif hp == 2:
+        hpimg = pygame.image.load("2hearts.png").convert_alpha()
+        screen.blit(hpimg, (screen_width - 300, -70))
+
+    elif hp == 1:
+        hpimg = pygame.image.load("1hearts.png").convert_alpha()
+        screen.blit(hpimg, (screen_width - 300, -70))
+
+    if hp <= 0:
+        # Create a small pop-up window
+        game_over_screen = pygame.Surface((300, 150))
+        game_over_screen.fill((169, 169, 169))  # Grey background
+
+        # Create font and text
+        font = pygame.font.Font(None, 36)
+        text1 = font.render("You Lost!", True, (255, 0, 0))
+        text2 = font.render(f"Score: {score}", True, (255, 255, 255))
+
+        # Blit text onto the pop-up window
+        game_over_screen.blit(text1, (100, 40))
+        game_over_screen.blit(text2, (100, 80))
+
+        # Display the pop-up window
+        screen.blit(game_over_screen, (screen_width // 2 - 150, screen_height // 2 - 75))
+        pygame.display.flip()
+
+        pygame.time.delay(5000)  # Pause for 5 seconds
+
+        running = False
+
+
+    touching_cloud = pygame.sprite.spritecollide(plane, clouds, False)
+
+    if touching_cloud:  # If there is a collision, show the overlay
+        overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
+        overlay.fill((255, 255, 255, 200))  # White with 50% opacity
+        screen.blit(overlay, (0, 0))
+
+    score_surface = font.render(f"Score: {score}", True, (255, 255, 255))
+    screen.blit(score_surface, (10, 10))
+
+    pygame.display.flip()
+    clock.tick(60)
+    pygame.display.flip()
