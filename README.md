@@ -33,6 +33,7 @@ You can install pygame with:
 
 ```bash
 pip install pygame
+```
 
 
 ## 📂 Assets
